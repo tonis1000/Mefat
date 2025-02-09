@@ -1,0 +1,2 @@
+env:
+  METAFR: ${{ secrets.METAFR }}
