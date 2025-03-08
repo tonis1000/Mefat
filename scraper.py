@@ -24,7 +24,7 @@ def scrape_iptv_links(url):
 # Beispiel-URLs für IPTV-Listen
 iptv_urls = [
     'https://iptv-org.github.io/iptv-countries/',  # Beispiel-URL 1
-    'https://www.iptvcat.com/',  # Beispiel-URL 2
+    'https://www.iptvcat.com/greece__4',  # Beispiel-URL 2
     'https://www.xiptv.com/'  # Beispiel-URL 3
 ]
 
