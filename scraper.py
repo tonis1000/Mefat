@@ -1,41 +1,32 @@
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+import time
 
-# Funktion zum Scrapen der IPTV-Links von einer Webseite
+# Beispiel: Scrape IPTV Links
 def scrape_iptv_links(url):
-    try:
-        response = requests.get(url)  # Holt die Webseite
-        response.raise_for_status()  # Überprüft, ob die Anfrage erfolgreich war
-        soup = BeautifulSoup(response.text, 'html.parser')  # Parsen des HTML-Inhalts
+    # Für statische Seiten:
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    for a_tag in soup.find_all('a', href=True):
+        if 'm3u' in a_tag['href']:
+            print(a_tag['href'])
 
-        links = []
-        # Suche nach allen <a>-Tags mit href-Attribut
-        for link in soup.find_all('a', href=True):
-            # Wenn der Link 'm3u' enthält, füge ihn zur Liste hinzu
-            if 'm3u' in link['href']:
-                links.append(link['href'])
+# Beispiel: Scrape IPTV Links mit Selenium (für dynamische Seiten)
+def scrape_dynamic_iptv_links(url):
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver.get(url)
+    time.sleep(3)  # Warten auf vollständiges Laden
+    links = driver.find_elements(By.XPATH, "//a[contains(@href, 'm3u')]")
+    for link in links:
+        print(link.get_attribute('href'))
+    driver.quit()
 
-        return links
-
-    except requests.exceptions.RequestException as e:
-        print(f"Fehler beim Abrufen der URL {url}: {e}")
-        return []
-
-# Beispiel-URLs für IPTV-Listen
-iptv_urls = [
-    'https://iptv-org.github.io/iptv-countries/',  # Beispiel-URL 1
-    'https://www.iptvcat.com/greece__4',  # Beispiel-URL 2
-    'https://www.xiptv.com/'  # Beispiel-URL 3
-]
-
-# Für jede URL die IPTV-Links scrapen und ausgeben
+# Beispiel-URLs
+iptv_urls = ['https://iptv-org.github.io/iptv-countries/']
 for url in iptv_urls:
-    print(f"Scraping von URL: {url}")
-    iptv_links = scrape_iptv_links(url)
-    if iptv_links:
-        print(f"Gefundene m3u-Links auf {url}:")
-        for link in iptv_links:
-            print(link)  # Gibt jeden gefundenen m3u-Link aus
-    else:
-        print(f"Keine m3u-Links gefunden auf {url}.")
-    print('-' * 50)
+    print(f"Scraping: {url}")
+    scrape_iptv_links(url)
